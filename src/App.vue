@@ -1,58 +1,52 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import FileUploadComponents from './components/FileUploadComponents.vue'
 
 const file = ref<File | null>(null)
 const fileError = ref('')
 const isLoading = ref(false)
 
-function handleFiles(files: FileList | null) {
-  fileError.value = ''
-  file.value = null
+const handleFiles = (newFile: File | null) => {
+  fileError.value = '';
+  file.value = newFile;
 
-  if (!files || files.length === 0) return
-
-  const selected = files[0]
-
-  const maxSizeMB = 2
-  const maxSizeBytes = maxSizeMB * 1024 * 1024
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-
-  if (!allowedTypes.includes(selected.type)) {
-    fileError.value = 'Неверный тип файла. Допустимы: JPG, PNG, WEBP.'
-    return
+  if (!newFile) {
+    isLoading.value = false;
+    return;
   }
 
-  if (selected.size > maxSizeBytes) {
-    fileError.value = `Файл слишком большой. Максимум ${maxSizeMB}MB.`
-    return
-  }
-
-  file.value = selected
-  isLoading.value = true
-
-  // Симуляция загрузки
+  isLoading.value = true;
   setTimeout(() => {
-    isLoading.value = false
-  }, 2000)
+    isLoading.value = false;
+  }, 2000);
+}
+
+const handleError= async (message: string) => {
+  fileError.value = ''
+  await nextTick() ;
+  fileError.value = message;
+  isLoading.value = false;
 }
 </script>
 
 <template>
   <div class="container">
     <FileUploadComponents 
-      label="Фотография"
+      label="Label"
       accept="image/*"
       :file="file"
       :error="fileError"
       :loading="isLoading"
-      hint="Максимум 2MB. Допустимые форматы: JPG, PNG, WEBP."
+      :allowedTypes="['image/jpeg', 'image/png', 'image/webp']"
+      :maxSize="2 * 1024 * 1024"
+      hint="Hint"
       @change="handleFiles"
+      @error="handleError"
     />
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   max-width: 400px;
   margin: 40px auto;
