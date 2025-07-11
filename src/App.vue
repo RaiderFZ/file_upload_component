@@ -46,7 +46,7 @@ const handleError= async (message: string) => {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .container {
   max-width: 400px;
   margin: 40px auto;

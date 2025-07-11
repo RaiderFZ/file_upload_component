@@ -81,8 +81,8 @@ const handleButtonClick = (): void => {
 </script>
 
 <template>
-    <div class="file-upload">
-         <label class="upload-label " :for="props.disabled ? undefined : 'file-input'">{{ props.label }}</label>
+    <div class="file-upload text-md">
+         <label class="upload-label text-sm" :for="props.disabled ? undefined : 'file-input'">{{ props.label }}</label>
 
         <div class="upload-row">
             <input
@@ -120,7 +120,7 @@ const handleButtonClick = (): void => {
             >
                 <span v-if="props.loading" class="spinner" />
                 <span 
-                    class="filename"
+                    class="filename text-md"
                     :class="{ 'filename--active': hasFile && !props.loading }" 
                 >
                     {{ selectedFileText }}
@@ -131,7 +131,7 @@ const handleButtonClick = (): void => {
         <div 
             v-if="props.error" 
             class="error-message"
-            id="file-error"  
+            id="file-error text-sm"  
             role="alert"
         >
             {{ props.error }}
@@ -139,22 +139,19 @@ const handleButtonClick = (): void => {
         <div 
             v-else-if="props.hint"
             id="file-hint" 
-            class="hint-text"
+            class="hint-text text-sm"
         >
             {{ props.hint }}
         </div>
     </div>
 </template>
 
-<style scoped lang="scss">
-@use '../styles/mixin' as *;
-@use '../styles/variables' as *;
-
+<style scoped>
 .spinner {
     width: 16px;
     height: 16px;
     border: 2px solid transparent;
-    border-top-color: $web-primary-500-base; 
+    border-top-color: var(--web-primary-500-base); 
     border-radius: 50%;
     animation: spin 1s linear infinite;
     display: inline-block;
@@ -167,7 +164,6 @@ const handleButtonClick = (): void => {
         transform: rotate(360deg);
     }
 }
-
 .visually-hidden {
     position: absolute !important;
     width: 1px;
@@ -180,14 +176,29 @@ const handleButtonClick = (): void => {
     border: 0;
 }
 
+.text-md {
+    font-family: 'Inter';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: -0.084px;
+}
+.text-sm {
+    font-family: 'Inter';
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;
+}
+
 .file-upload {
-    @include text-md;
     display: inline-block;
     position: relative;
     width: 100%;
 }
 .upload-label {
-    color: $web-neutral-900;
+    color: var(--web-neutral-900);
     display: block;
     margin-bottom: 12px;
 }
@@ -201,19 +212,19 @@ const handleButtonClick = (): void => {
     display: none;
 }
 .upload-button {
-    color: $web-neutral-700;
+    color: var(--web-neutral-700);
     padding: 12px 20px;
     font-size: 14px;
     font-weight: 400;
-    border:  1px solid $web-neutral-200;
-    background-color: $background-white;
+    border:  1px solid var(--web-neutral-200);
+    background-color: var(--background-white);
     border-radius: 12px;
     transition: background-color 0.2s;
     cursor: pointer;
     box-shadow: 0px 3px 7px -3px rgba(0, 0, 0, 0.08), 0px 4px 8px 0px rgba(0, 0, 0, 0.02);
 }
 .upload-button:hover {
-    border: 1px solid $web-neutral-300;
+    border: 1px solid var(--web-neutral-300);
     background-color: #F3F4F6;
     box-shadow: 0px 0px 0px 2px rgba(107, 114, 128, 0.10)
 }
@@ -221,17 +232,17 @@ const handleButtonClick = (): void => {
     box-shadow: 0px 0px 0px 2px rgba(107, 114, 128, 0.10);
 }
 .upload-button:disabled {
-    color: $web-neutral-400;
-    border: 1px solid $web-neutral-200;
+    color: var(--web-neutral-400);
+    border: 1px solid var(--web-neutral-200);
     box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.02);
     cursor: default;
 }
 .upload-button:active {
-    border: 1px solid $web-neutral-300;
-    background: $web-neutral-200;
+    border: 1px solid var(--web-neutral-300);
+    background: var(--web-neutral-200);
 }
 .file-status {
-    color: $web-neutral-400;
+    color: var(--web-neutral-400);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -239,22 +250,18 @@ const handleButtonClick = (): void => {
     
     cursor: pointer;
 }
-
 .error-message {
-    color:  $web-error-500-base;
-    font-size: 12px;
+    color:  var(--web-error-500-base);
     margin-top: 8px;
 }
 .hint-text {
-    color: $web-neutral-500-base;
-    font-size: 12px;
+    color: var(--web-neutral-500-base);
     margin-top: 4px;
 }
 .filename {
-    @include text-md;
-    color: $web-neutral-400;
+    color: var(--web-neutral-400);
 }
 .filename--active {
-    color: $web-neutral-500-base;
+    color: var(--web-neutral-500-base);
 }
 </style>
