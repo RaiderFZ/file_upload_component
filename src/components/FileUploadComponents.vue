@@ -31,10 +31,16 @@ const selectedFileText = computed(() => {
 
 const validateFile = (file: File): { valid: boolean; message?: string } => {
   if (props.allowedTypes && props.allowedTypes.length > 0 && !props.allowedTypes.includes(file.type)) {
-    return { valid: false, message: 'Неверный тип файла. Допустимы: JPG, PNG, WEBP.' };
+    return { 
+        valid: false, 
+        message: 'Неверный тип файла. Допустимы: JPG, PNG, WEBP.' 
+    };
   };
   if (props.maxSize && file.size > props.maxSize) {
-    return { valid: false, message: `Файл слишком большой. Максимум ${props.maxSize / (1024 * 1024)}MB.` }
+    return { 
+        valid: false, 
+        message: `Файл слишком большой. Максимум ${props.maxSize / (1024 * 1024)}MB.` 
+    }
   };
   return { valid: true };
 }
@@ -199,7 +205,7 @@ const handleButtonClick = (): void => {
     padding: 12px 20px;
     font-size: 14px;
     font-weight: 400;
-    border:  1px solid #E5E7EB;
+    border:  1px solid $web-neutral-200;
     background-color: $background-white;
     border-radius: 12px;
     transition: background-color 0.2s;
@@ -218,6 +224,7 @@ const handleButtonClick = (): void => {
     color: $web-neutral-400;
     border: 1px solid $web-neutral-200;
     box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.02);
+    cursor: default;
 }
 .upload-button:active {
     border: 1px solid $web-neutral-300;
@@ -231,10 +238,6 @@ const handleButtonClick = (): void => {
     font-size: 13px;
     
     cursor: pointer;
-}
-.file-status.disabled {
-    cursor: default;
-    color: #aaa;
 }
 
 .error-message {
