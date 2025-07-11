@@ -42,6 +42,10 @@ const handleError= async (message: string) => {
       hint="Hint"
       @change="handleFiles"
       @error="handleError"
+      @cancel="() => { 
+        isLoading = false;
+        file = null;
+      }"
     />
   </div>
 </template>

@@ -11,13 +11,24 @@ interface FileUploadProps {
     disabled?: boolean
     allowedTypes?: string[]
     maxSize?: number
+
 }
 
-const props = defineProps<FileUploadProps>()
+const props = withDefaults(defineProps<FileUploadProps>(), {
+  accept: '',
+  file: null,
+  error: '',
+  hint: '',
+  loading: false,
+  disabled: false,
+  allowedTypes: () => [],
+  maxSize: 0
+})
 
 const emit = defineEmits<{
     (e: 'change', file: File | null): void
     (e: 'error', message: string): void
+    (e: 'cancel'): void
 }>()
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -31,17 +42,21 @@ const selectedFileText = computed(() => {
 
 const validateFile = (file: File): { valid: boolean; message?: string } => {
   if (props.allowedTypes && props.allowedTypes.length > 0 && !props.allowedTypes.includes(file.type)) {
+    const typesList = props.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')
     return { 
         valid: false, 
-        message: 'Неверный тип файла. Допустимы: JPG, PNG, WEBP.' 
+        message: `Недопустимый тип файла. Разрешены: ${typesList}.`
     };
-  };
+  }
+
   if (props.maxSize && file.size > props.maxSize) {
+    const sizeMb = (props.maxSize / (1024 * 1024)).toFixed(2);
     return { 
         valid: false, 
-        message: `Файл слишком большой. Максимум ${props.maxSize / (1024 * 1024)}MB.` 
-    }
-  };
+        message: `Файл слишком большой. Максимальный размер: ${sizeMb} MB.`
+    };
+  }
+
   return { valid: true };
 }
 
@@ -65,19 +80,34 @@ const onFileChange = (event: Event): void => {
     emit('change', file);
 };
 
+const buttonLabel = computed(() => {
+  if (props.loading) return 'Отменить'
+  if (hasFile.value) return 'Удалить'
+  return 'Выбрать файл'
+})
+
+const handleButtonClick = (): void => {
+    if (props.disabled) return;
+
+    if (props.loading) {
+        emit('cancel');
+        return;
+    }
+
+    if (hasFile.value) {
+        clearFile();
+        return;
+    }
+
+    fileInput.value?.click();
+};
+
 const clearFile = (): void => {
     if (fileInput.value) fileInput.value.value = '';
     emit('change', null);
 };
 
-const handleButtonClick = (): void => {
-    if (props.disabled || props.loading) return;
-    if (hasFile.value) {
-        clearFile();
-    } else {
-        fileInput.value?.click();
-    };
-};
+
 </script>
 
 <template>
@@ -104,20 +134,20 @@ const handleButtonClick = (): void => {
                 type="button"
                 class="upload-button"
                 @click="handleButtonClick"
-                :disabled="props.loading || props.disabled"
-                :aria-label="hasFile ? 'Очистить файл' : 'Выбрать файл'"
+                :disabled="props.disabled"
+                :aria-label="buttonLabel"
             >
-                {{ hasFile ? 'Отменить' : 'Выбрать файл' }}
+                {{ buttonLabel }}
             </button>
 
             <div
                 class="file-status"
-                role="button"
+                role="presentation"
                 tabindex="0"
-                @click="hasFile && !props.disabled && !props.loading && clearFile()"
-                @keydown.enter.space="hasFile && !props.disabled && !props.loading && clearFile()"
-                :aria-label="hasFile ? 'Очистить выбранный файл' : undefined"
-            >
+                @click="!props.disabled && !props.loading && fileInput?.click()"
+                @keydown.enter.space="!props.disabled && !props.loading && fileInput?.click()"
+                :aria-label="hasFile ? 'Файл выбран: ' + selectedFileText : 'Нажмите, чтобы выбрать файл'"
+                >
                 <span v-if="props.loading" class="spinner" />
                 <span 
                     class="filename text-md"
@@ -226,9 +256,10 @@ const handleButtonClick = (): void => {
 .upload-button:hover {
     border: 1px solid var(--web-neutral-300);
     background-color: #F3F4F6;
-    box-shadow: 0px 0px 0px 2px rgba(107, 114, 128, 0.10)
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.02);
 }
 .upload-button:focus {
+    outline: none;
     box-shadow: 0px 0px 0px 2px rgba(107, 114, 128, 0.10);
 }
 .upload-button:disabled {
@@ -238,6 +269,7 @@ const handleButtonClick = (): void => {
     cursor: default;
 }
 .upload-button:active {
+    box-shadow: none;
     border: 1px solid var(--web-neutral-300);
     background: var(--web-neutral-200);
 }
@@ -247,8 +279,11 @@ const handleButtonClick = (): void => {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    
-    cursor: pointer;
+    user-select: none;
+}
+
+.file-status:focus {
+    outline: none;
 }
 .error-message {
     color:  var(--web-error-500-base);
@@ -261,6 +296,7 @@ const handleButtonClick = (): void => {
 .filename {
     color: var(--web-neutral-400);
 }
+
 .filename--active {
     color: var(--web-neutral-500-base);
 }
